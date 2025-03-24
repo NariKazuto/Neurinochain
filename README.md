@@ -56,4 +56,44 @@ bility, and transparency.
 
 ---
 
-:
+neurinochain/
+└── src/
+    ├── core/
+    │   ├── sign_block.S              # Signs a block using Ed25519
+    │   ├── verify_block.S            # Verifies block integrity and signature
+    │   ├── transaction_format.S      # Parses and formats transaction structure
+    │   ├── block_format.S            # Defines block structure and fields
+    │   ├── base58_encode.S           # Encodes wallet, token, and chain addresses
+    │   ├── constants.S               # Global constants (fees, flags, limits)
+    │   ├── state_storage.S           # Basic key-value state management
+    │   └── mainchain_init.S          # Initializes the mainchain state
+    │
+    ├── crypto/
+    │   ├── ed25519_sign.S            # Ed25519 signing algorithm
+    │   ├── ed25519_verify.S          # Ed25519 signature verification
+    │   ├── scalar_mul_base.S         # Scalar multiplication with base point
+    │   ├── field_add.S               # Finite field addition
+    │   ├── field_sub.S               # Finite field subtraction
+    │   ├── field_mul.S               # Finite field multiplication
+    │   ├── field_square.S            # Finite field squaring
+    │   ├── field_reduce.S            # Field reduction mod p
+    │   ├── sha512.S                  # SHA-512 hashing algorithm
+    │   └── keccak256.S               # (Optional) Keccak256 for interoperability
+    │
+    └── modules/
+        ├── smallchain_create.S       # Creates a new smallchain (token-like chain)
+        ├── smallchain_update.S       # Updates config of an existing smallchain
+        ├── token_create.S            # Creates a new token
+        ├── token_transfer.S          # Transfers token between wallets
+        ├── approval_rules.S          # Handles multi-sig, quorum, and delays
+        ├── commit_reveal.S           # Deterministic randomness module
+        ├── pruning.S                 # Prunes data older than 5 years
+        ├── merkle_storage.S          # Anchors off-chain storage with Merkle roots
+        ├── dex_logic.S               # Core logic for integrated DEX (optional)
+        ├── staking.S                 # Token staking (configurable per chain)
+        ├── snapshot.S                # Generates state snapshot of chain or token
+        ├── airdrop.S                 # Distributes tokens to holders
+        ├── ownership_transfer.S      # Transfers control of token or chain
+        ├── blacklist_whitelist.S     # Manages access restrictions to tokens
+        └── fee_logic.S               # Custom fee rules for modules and chains
+
