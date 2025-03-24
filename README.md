@@ -46,6 +46,8 @@ Neurinochain is designed to:
 - `ownership_transfer.S` – Admin rights transfers
 - `blacklist_whitelist.S` – Access control
 - `fee_logic.S` – Custom transaction fee logic
+- `vote_reputation.S` – Allows voting on reliability (fee-based)
+- `auto_reputation.S` – Automatically adjusts reputation based on usage and behavior
 
 `/wasm` – Compiled WebAssembly Modules  
 - `core_runtime.wasm`
@@ -94,6 +96,15 @@ Neurinochain is designed to:
 
 ---
 
+🔢 **Reputation System**
+- Hybrid system for rating smallchains and tokens
+- Users can vote up/down with a fee of `0.00000100 NEU` (discourages spam)
+- Maximum score: 10,000 per entity
+- Auto-adjustment modules may reward uptime, usage, stability
+- Used to sort/filter in DEX, explorer, and UI
+
+---
+
 ✅ **Why Neurinochain?**
 - Full blockchain execution inside Tor Browser
 - Works on old devices (ARM/x86)
@@ -114,5 +125,4 @@ Start with:
 - `webapp/`
 
 Pull requests and ideas are welcome!
-
 
