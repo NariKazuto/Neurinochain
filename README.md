@@ -18,9 +18,9 @@ Neurinochain is designed to:
 `/src/core` – Blockchain Runtime  
 - `sign_block.S` – Signs blocks using Ed25519
 - `verify_block.S` – Verifies block signatures
-- `transaction_format.S` – Parses and serializes transactions
+- `transaction_format_light.S` – Lightweight format for Tor/browser
 - `block_format.S` – Defines block structure
-- `base58_encode.S` – Encodes wallet and token addresses
+- `address_encode.S` – Encodes public key to readable address (chainID_objectID_hash)
 - `constants.S` – Global flags, fees, limits
 - `state_storage.S` – Abstract key-value state interface
 - `mainchain_init.S` – Bootstraps the mainchain
@@ -34,20 +34,24 @@ Neurinochain is designed to:
 - `keccak256.S` – Optional hash for interoperability
 
 `/src/modules` – Blockchain Extensions  
-- `smallchain_create.S` – Creates isolated smart-token chains
-- `smallchain_update.S` – Modifies chain settings
-- `token_create.S`, `token_transfer.S` – Token system logic
+- `object_create.S` – Unified creation of mainchain, tokens, smallchains, and embedded tokens
+- `object_transfer.S` – Transfer logic for all object types
+- `token_properties.S` – Bitwise flags for properties (divisible, mintable, chain_enabled, etc.)
+- `chain_wrapper.S` – Enables chain features on token objects
 - `approval_rules.S` – Quorum, multisig, delayed approvals
 - `commit_reveal.S` – Secure randomness
 - `pruning.S` – Deletes historical data > 5 years
 - `merkle_storage.S` – Persists only Merkle roots
-- `dex_logic.S` – Basic decentralized exchange logic
+- `dex_logic.S` – Basic decentralized exchange logic, shared across all chains
+- `explorer_logic.S` – Unified explorer for mainchain and smallchains (visibility can be toggled)
 - `staking.S`, `airdrop.S`, `snapshot.S` – Token management
 - `ownership_transfer.S` – Admin rights transfers
 - `blacklist_whitelist.S` – Access control
 - `fee_logic.S` – Custom transaction fee logic
 - `vote_reputation.S` – Allows voting on reliability (fee-based)
 - `auto_reputation.S` – Automatically adjusts reputation based on usage and behavior
+- `marketplace_store.S` – Module for decentralized store (buy/sell/auction any tokenized asset)
+- `royalty_logic.S` – Enables creators to charge royalties on reusable modules, contracts, or services
 
 `/wasm` – Compiled WebAssembly Modules  
 - `core_runtime.wasm`
@@ -68,9 +72,9 @@ Neurinochain is designed to:
 - `wasm_build.md` – Build guide for `.S → .wasm`
 - `tor_optimizations.md` – Run Neurinochain over Tor
 - `browser_support.md` – Compatibility matrix
+- `design_tokens_and_chains.md` – Explanation of unified object model (token-as-chain)
 
 `/tools` – Dev Tools  
-- `base58_encoder.py` – Base58 wallet encoder
 - `keygen.py` – Generates Ed25519 keys
 - `wasm_builder.sh` – Compiles Assembly into WebAssembly
 
@@ -105,6 +109,24 @@ Neurinochain is designed to:
 
 ---
 
+🔐 **Unified Object Model: Chains = Enhanced Tokens**
+All objects (tokens, smallchains, mainchain) are created via `object_create.S` using a shared format.
+
+**Address Format:**
+Neurinochain addresses follow a structured format using chain and object IDs:
+```
+<chain_id>_<object_id>_<hash>
+```
+### Examples:
+```
+00_00_8d3a72f4e6c93204cb1f4e9817d4e3bc438bc4c6ef3fc03e10fc2f02e5d624a7   ; mainchain
+00_01_dfd234a1ec9f0102030405060708deadbeef112233445566778899aabbcc       ; NEUR token
+01_00_6fd31a084c3c1efcad308fc14a3c9eb1676db218ff607b4076beac5fc8f07e32   ; smallchain 1
+01_01_abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd         ; token in SC01
+```
+
+---
+
 ✅ **Why Neurinochain?**
 - Full blockchain execution inside Tor Browser
 - Works on old devices (ARM/x86)
@@ -122,7 +144,12 @@ MIT — open to use, study, remix, or contribute.
 Start with:
 - `docs/specs.md`
 - `src/core/`
+- `src/modules/object_create.S`
+- `src/modules/marketplace_store.S`
+- `src/modules/royalty_logic.S`
+- `docs/design_tokens_and_chains.md`
 - `webapp/`
 
 Pull requests and ideas are welcome!
+
 
