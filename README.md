@@ -126,7 +126,7 @@ Assembly modules by category:
 - `object_properties.S`, `approval_rules.S`, `chain_wrapper.S`
 - `dex_logic.S`, `marketplace_store.S`, `royalty_logic.S`
 - `vote_reputation.S`, `auto_reputation.S`, `blacklist_whitelist.S`
-- `staking.S`, `staking_main.S`, `airdrop.S`, `snapshot.S`
+- `staking.S`, `airdrop.S`, `snapshot.S`
 - `fee_logic.S`, `pruning.S`, `merkle_storage.S`
 
 ---
@@ -204,4 +204,5 @@ Start from:
 - `webapp/index.html`
 
 Pull requests welcome!
+
 
