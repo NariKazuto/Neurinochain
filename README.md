@@ -35,12 +35,12 @@
 
 ## 🌐 Tor + WASM Friendly Design
 
-- Blocks every **30 seconds** (mainchain), up to **10 blocks/sec sync burst**
-- Tor-optimized propagation
-- `.onion` relay/node support (`torrc + HiddenService`)
+- Blocks every **30 seconds** (mainchain)
+- **Sync burst**: up to **10 blocks/sec** for catch-up
 - Browser-only interface using WebAssembly (no install)
-- **Merkle root per block** only — no state DB
-- Full wallet and DEX usable over Tor
+- Low bandwidth Merkle-only storage (no DB)
+- `.onion` relay/node supported
+- Full staking, DEX and reward logic runs client-side
 
 ---
 
@@ -48,23 +48,20 @@
 
 All objects (wallets, tokens, chains, etc.) are identified by their **Base32-encoded SHA-512 hash**.
 
-No need for chain_id or object_id prefixes inside the address itself.
-
 ```text
 MFZXKZ3WOBSWIIDTNF2HI3DJNZTGS4TDL5XGIY3JLFBQ
 ```
 
-The metadata (chain, object type, etc.) is recorded separately in the chain state and used by the DApp and WASM modules.
+The metadata (chain, object type, etc.) is recorded in the `object_registry`, not inside the address.
 
 ---
 
-## 🔍 Object Registry
+## 🧾 Object Registry
 
 Every object (wallet, token, chain, contract...) is represented by its Base32 SHA-512 hash.
 To understand its role and metadata, Neurinochain uses an **`object_registry`**, included in the chain state and referenced in block files.
 
 Example entry:
-
 ```json
 {
   "id": "MFZXKZ3WOBSWIIDTNF2HI3DJNZTGS4TDL5XGIY3JLFBQ",
@@ -80,9 +77,32 @@ Example entry:
 }
 ```
 
-- Stored inside block state
-- Verifiable via Merkle root
-- Required for DApp logic and WASM interpretation
+---
+
+## 🔄 Staking & Block Consensus (Mainchain)
+
+- Wallets with **≥ minimum NEU** in staking can participate
+- **Node with highest stake** gets priority if synchronized
+- If node is desynced → first available synced node takes over
+- If another synced node is waiting → block creator cedes on completion
+- If a node created **10 blocks in the last 2880**, it's excluded for 2880
+
+### 🧠 Reward Logic (per block)
+- **10 NEU created magically** (invisible minting)
+- **All fees collected** in the block
+- Distributed **proportionally** to active (synced) stakers
+- **Winning node gets +10% bonus** on its proportional share
+- Nodes not synced = ❌ no rewards
+- Rewards are **credited to spendable balance**, but:
+  - Not automatically staked
+  - Must sell **≥ 50% of rewards in DEX** or be blocked
+
+### 📈 Difficulty / Inflation Control (every 2880 blocks)
+- **Staking minimum** increases by **0.0567%**
+- **NEU penalty of -0.0567%** to nodes under quota (given to forger)
+- **New NEU minted** = 0.0567% of total staked
+- Minted NEU are placed **directly in the DEX** at +0.0567% price
+- No tx recorded — appears as automatic DEX liquidity
 
 ---
 
@@ -93,21 +113,24 @@ Transactions are recorded with:
 - `amount`, `fee`
 - optional `data`
 
-Transactions are hashed and signed. The `merkle_root` of each block summarizes all tx hashes for that block.
+Only user-initiated tx are part of the Merkle root.
+Reward logic is excluded.
 
 ---
 
 ## 🧱 Block Format
 
 Each block includes:
-
 - `timestamp`
 - `previous_block_hash`
-- `merkle_root` (hash of txs)
-- `generator_public_key`
+- `merkle_root` (of txs only)
+- `forger_public_key`
 - `signature` (Ed25519)
 
-All saved as signed `.json` objects — no database required.
+And special **invisible fields**, excluded from Merkle:
+- `reward_neu` = 10 NEU block reward
+- `reward_fee_total` = total tx fees in block
+- Used only in consensus modules
 
 ---
 
@@ -124,10 +147,10 @@ Assembly modules by category:
 ### `/src/modules/`
 - `object_create.S`, `object_transfer.S`
 - `object_properties.S`, `approval_rules.S`, `chain_wrapper.S`
+- `staking_main.S`, `dex_liquidity_mint.S`
 - `dex_logic.S`, `marketplace_store.S`, `royalty_logic.S`
 - `vote_reputation.S`, `auto_reputation.S`, `blacklist_whitelist.S`
-- `staking.S`, `airdrop.S`, `snapshot.S`
-- `fee_logic.S`, `pruning.S`, `merkle_storage.S`
+- `airdrop.S`, `snapshot.S`, `fee_logic.S`, `pruning.S`, `merkle_storage.S`
 
 ---
 
@@ -143,19 +166,15 @@ Assembly modules by category:
 ## 🛠️ Build & Run
 
 ### Compile WASM
-
 ```bash
 ./tools/wasm_builder.sh
 ```
 
 ### Run in browser
-
 Serve `/webapp` folder via local server or `.onion`:
-```
+```bash
 ipfs add -r webapp/  # optional legacy
 ```
-
-Works out of the box on **Tor Browser**.
 
 ---
 
@@ -171,9 +190,8 @@ Neurinochain uses signed `.json` block files:
   "signature": "..."
 }
 ```
-
-WASM modules validate Merkle root and parse contents locally.
-No need for remote API, database, or full-node.
+- Merkle root verifies user tx only
+- Rewards are stored separately and verified in module logic
 
 ---
 
@@ -183,7 +201,7 @@ No need for remote API, database, or full-node.
 - Pure Assembly + WASM = light and modular
 - Browser and Tor-friendly
 - Verifiable via Merkle root only
-- Education-ready, censorship-resistant
+- Reward and inflation logic handled off-chain invisibly
 
 ---
 
@@ -199,10 +217,10 @@ Start from:
 - `src/core/mainchain_init.S`
 - `src/modules/object_create.S`
 - `src/modules/object_properties.S`
-- `src/core/address_encode.S`
+- `src/modules/staking_main.S`
+- `src/modules/dex_liquidity_mint.S`
 - `docs/specs.md`
 - `webapp/index.html`
 
 Pull requests welcome!
-
 
