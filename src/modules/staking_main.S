@@ -15,57 +15,82 @@ _staking_main:
     ; -----------------------------------------
     ; 1. Check if current node is eligible
     ; -----------------------------------------
-    ; - Must be synchronized
-    ; - Must have stake >= minimum_stake
-    ; - Must not be in exclusion window (past 2880 blocks)
+    bl get_current_node_stake         ; → r0 = stake (NEU 10^18)
+    bl get_current_node_sync_flag     ; → r1 = 1 if synced, 0 if not
+    bl get_dynamic_minimum_stake      ; → r2 = minimum stake (NEU)
 
-    ; TODO: load node state, sync flag, stake balance
-    ; TODO: compare with minimum stake (dynamic)
+    cmp r1, #0
+    beq skip_forging                  ; not synced
+
+    cmp r0, r2
+    blt skip_forging                  ; not enough stake
+
+    bl check_forging_limit            ; if node exceeded 10/2880 → skip
+    cmp r0, #0
+    beq skip_forging
 
     ; -----------------------------------------
     ; 2. Select eligible forger
     ; -----------------------------------------
-    ; - Highest stake among synced nodes
-    ; - If current node finished block and another synced exists → cede
-    ; - If current node desyncs → next available node takes over
+    bl select_highest_stake_synced_node   ; r0 = address
+    mov r8, r0                            ; save forger address
 
-    ; TODO: loop through candidate list, get synced + stake
-    ; TODO: choose highest stake (or first synced if fallback)
+    bl is_another_synced_node_waiting
+    cmp r0, #1
+    beq pass_turn_to_next
 
     ; -----------------------------------------
     ; 3. Distribute block reward (10 NEU + fee)
     ; -----------------------------------------
-    ; - Use proportional split to active stakers
-    ; - Forger gets +10% extra on its share
-    ; - Nodes not synced = excluded
+    bl get_total_synced_stake      ; r0 = total_stake
+    mov r9, r0
 
-    ; TODO: load total active stake
-    ; TODO: for each participant:
-    ;         - base_share = (stake / total_stake)
-    ;         - if forger: base_share *= 1.1
-    ; TODO: sum shares, write to balance table
+    mov r0, #0                     ; index = 0
+reward_loop:
+    bl get_node_stake_by_index       ; r1 = stake
+    bl get_node_sync_flag_by_index   ; r2 = 1/0
+    cmp r2, #0
+    beq skip_this_node
+
+    mul r3, r1, #1000000
+    udiv r3, r3, r9
+
+    bl is_index_forger
+    cmp r0, r8
+    bne apply_share
+
+    mul r3, r3, #110
+    udiv r3, r3, #100
+
+apply_share:
+    mov r4, #10000000000000000000     ; 10 NEU
+    mul r5, r3, r4
+    udiv r5, r5, #1000000
+
+    bl credit_node_reward
+
+skip_this_node:
+    add r0, r0, #1
+    cmp r0, #100     ; assuming 100 nodes max
+    blt reward_loop
 
     ; -----------------------------------------
     ; 4. Penalty logic
     ; -----------------------------------------
-    ; - If node forged 10 blocks in last 2880 → skip 2880 blocks
-    ; - If node misses minimum daily quota → -0.0567% penalty
-    ;     (given to forger of the current block)
+    bl check_node_forged_10_blocks
+    cmp r0, #1
+    beq add_exclusion_2880_blocks
 
-    ; TODO: check history of forging per node
-    ; TODO: apply penalty if needed
+    bl check_minimum_stake_quota
+    cmp r0, #0
+    beq apply_penalty_to_share
 
     ; -----------------------------------------
     ; 5. Write result to block state
     ; -----------------------------------------
-    ; - Block creator = forger
-    ; - Rewards = not stored as tx but in state
-    ; - Merkle root excludes reward logic
+    mov r0, r8
+    bl set_block_forger_metadata
+    bl commit_reward_balances
 
-    ; TODO: update forger address in block metadata
-    ; TODO: commit updated balances
-    ; TODO: skip reward tx in Merkle calc
-
-    ; -----------------------------------------
-    ; Done
+skip_forging:
     ret
