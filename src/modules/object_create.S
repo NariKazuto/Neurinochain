@@ -1,14 +1,23 @@
+; object_create.S — Create Objects (Token, Smallchain, NFT...)
+; -------------------------------------------------------------
+; This module creates new blockchain objects using a shared structure.
 ;
-; object_create.S — Create Objects (Mainchain, Token, Smallchain, NFT...)
-; ------------------------------------------------------------------------
-; This module creates new blockchain objects with a shared structure.
-; Each object has:
-;  - Base32 ID (SHA-512 hash of contents)
-;  - Type: mainchain, token, smallchain, NFT
-;  - Optional properties (bitwise)
-;  - Owner, creation block, initial supply
+; Output: an ENCODED_BODY = Base32(SHA-512 hash of parameters)
 ;
-; The object is registered in `object_registry`.
+; Objects are categorized by internal flags:
+;   - Smallchains are tokens with "chain_enabled" property
+;   - NFTs are tokens with 0 decimals + unique supply
+;
+; Mainchain is NOT created here (predefined)
+;
+; Each object includes:
+;   - ENCODED_BODY (Base32 of SHA-512)
+;   - Type and flags (stored in metadata, not in the ID)
+;   - Owner (creator wallet)
+;   - Block height
+;   - Optional name/logo for display (not stored on-chain)
+;
+; Registered in `object_registry` for consensus use.
 ;
 
 .section .text
@@ -20,42 +29,43 @@ _object_create:
     ; 1. Validate Creator
     ; -----------------------------------------
     ; - Must be a valid wallet with permissions
-    ; - Must pay creation fee (if enforced)
+    ; - Must pay creation fee (defined in fees.S)
 
     ; TODO: check creator address
     ; TODO: verify signature
-    ; TODO: deduct creation cost (ex: 100 NEU)
+    ; TODO: deduct creation cost (e.g. 100 NEU)
 
 
     ; -----------------------------------------
-    ; 2. Parse Object Type + Params
+    ; 2. Parse Object Parameters
     ; -----------------------------------------
-    ; - Type: 0 = mainchain, 1 = token, 2 = smallchain, 3 = NFT
-    ; - Name, supply, decimals, properties (bitflags)
+    ; - Flags: is_smallchain, is_mintable, is_nft, etc.
+    ; - Name (for UI), supply, decimals
 
     ; TODO: load and validate input fields
-    ; TODO: reject if type already exists (ex: second mainchain)
+    ; TODO: reject conflicting settings (e.g. NFT with >1 supply)
 
 
     ; -----------------------------------------
-    ; 3. Compute Object ID (Base32)
+    ; 3. Compute Object ID (ENCODED_BODY)
     ; -----------------------------------------
-    ; - SHA-512 hash of all parameters
-    ; - Encode in Base32
+    ; - SHA-512 hash of normalized parameters
+    ; - Encode result in Base32
 
     ; TODO: prepare input buffer
-    ; TODO: call sha512 -> base32 encoder
+    ; TODO: call sha512 → base32 encoder
 
 
     ; -----------------------------------------
     ; 4. Register in object_registry
     ; -----------------------------------------
-    ; - Save to block state as new entry
-    ; - Includes metadata + properties + creation block
+    ; - Save object metadata, flags, owner, etc.
+    ; - Used for validation and UI info
 
-    ; TODO: write full object struct to registry
+    ; TODO: store object in registry
 
 
     ; -----------------------------------------
     ; Done
     ret
+
