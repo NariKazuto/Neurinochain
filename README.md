@@ -2,7 +2,6 @@
   <img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/nuologo256.png" alt="Neurinochain logo" width="128" />
 </p>
 
-
 # 🧠 Neurinochain
 
 **Neurinochain** is a fully modular blockchain written in pure Assembly, optimized for slow networks, outdated hardware, and privacy-preserving environments such as Tor. It supports WebAssembly (WASM), zero-installation browser usage, and decentralized Merkle-based storage.
