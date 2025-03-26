@@ -24,6 +24,7 @@ It features:
 - No Tor required (but optionally compatible)
 - Fully customizable fee system per operation
 - User-loadable modules per smallchain
+- Optional display names and logos in the UI
 
 ---
 
@@ -41,32 +42,53 @@ Neurinochain uses a "pure state" model:
 
 Neurinochain uses a strict and expandable ID structure to identify all objects in the network.
 
-### 🔹 Prefix Format: `CHAIN_ID`_`OBJECT_ID`_`TYPE_ID`_
+### 🔹 Internal Format: `ENCODED_BODY` only (Base32)
 
-| Segment       | Description                         | Example         |
-|---------------|-------------------------------------|-----------------|
-| `CHAIN_ID`    | The chain the object belongs to     | `00_` = mainchain, `01_` = smallchain 1, etc. |
-| `OBJECT_ID`   | Object type scope (native or user)  | `00_` = native object in that chain          |
-| `TYPE_ID`     | Type of object                      | `T_`, `W_`, `D_`, `OBJ_`                     |
+- Internally, all objects are referenced by a Base32 string only
+- The structure inside the encoded body defines:
+  - Chain ID
+  - Object type (token, wallet, etc.)
+  - Object-specific data (hash, pubkey, etc.)
 
-### 🔹 Object Type Examples
+### 🔍 Visual Naming (UI-only)
 
-| Object              | Prefix Example            | Description                                      |
-|---------------------|---------------------------|--------------------------------------------------|
-| **Mainchain token** | `00_00_T_ABC...`          | Token on mainchain                              |
-| **Wallet (main)**   | `00_00_W_XYZ...`          | Wallet operating on mainchain                   |
-| **DEX Order (main)**| `00_00_D_DEF...`          | Order registered on mainchain DEX               |
-| **Token (small)**   | `01_00_T_ABC...`          | Native token on smallchain #1                   |
-| **Wallet (small)**  | `01_00_W_...`             | Wallet scoped to smallchain #1                  |
-| **DEX (small)**     | `01_00_D_...`             | DEX orders in smallchain #1                     |
-| **Custom object**   | `00_00_OBJ_...`           | Unregistered user module, not verified by chain |
-
-### ✅ All identifiers follow this format:
+For users, each object can display an optional visual name and icon in wallets, explorers, and DEX listings.
+The actual ID used by the chain remains a pure Base32 `ENCODED_BODY` like:
 ```
-[CHAIN_ID]_[OBJECT_ID]_[TYPE_ID]_[ENCODED_BODY]
+MFZXKZ3WOBSWIIDTNF2HI3DJNZTGS4TDL5XGIY3JLFBQ
 ```
-- Encoded body is always Base32, no padding
-- Length and prefix validate the structure
+
+UI display may optionally show:
+```
+SupplyNet / token / MFZXKZ3WOBSWIIDTNF2HI3DJNZTGS4TDL5XGIY3JLFBQ
+```
+This is for readability only and not used by consensus or Merkle state.
+
+#### UI Metadata Example (JSON-like):
+```json
+{
+  "id": "MFZXKZ3WOBSWIIDTNF2HI3DJNZTGS4TDL5XGIY3JLFBQ",
+  "name": "SupplyNet",
+  "type": "token",
+  "logo": "/webapp/assets/tokens/MFZXKZ3WOBSWIIDT....svg"
+}
+```
+
+### 📁 Optional Local Assets
+
+UI logos and names are not stored on-chain. They can be added locally by users or chain creators.
+
+All object IDs are internally pure `ENCODED_BODY` strings. File names must match exactly.
+
+| Object Type | Path Example                                        | Max Size          |
+|-------------|------------------------------------------------------|-------------------|
+| Chain       | `/webapp/assets/chains/MFZXKZ3WOBSWIIDT....svg`     | ≤ 8 KB            |
+| Token       | `/webapp/assets/tokens/ABCDABCDABCDAB....svg`       | ≤ 8 KB            |
+| Custom Code | `/webapp/assets/custom/XYZXYZXYZXYZYZ....svg`       | ≤ 8 KB            |
+|-------------|------------------------------------------------------|-------------------|
+| Chain       | `/webapp/assets/chains/<ENCODED_BODY>.svg`         | ≤ 8 KB            |
+| Token       | `/webapp/assets/tokens/<ENCODED_BODY>.svg`         | ≤ 8 KB            |
+| Custom OBJ  | `/webapp/assets/obj/<ENCODED_BODY>.svg`            | ≤ 8 KB            |
 
 ---
 
@@ -80,6 +102,7 @@ Neurinochain uses a strict and expandable ID structure to identify all objects i
 /src/custom/       → Custom module loaders for smallchains (exposed as OBJ_)
 /wasm/             → Compiled WebAssembly modules
 /webapp/           → WASM browser client (HTML/CSS/JS)
+/webapp/assets/    → Optional logos for chains, tokens, objects
 /docs/             → Specs and technical guides
 /tools/            → Keygen, builder scripts, dev tools
 ```
@@ -148,16 +171,16 @@ Neurinochain uses a strict and expandable ID structure to identify all objects i
 ### `/src/core/`
 - `mainchain_init.S` — Boot logic
 - `block_format.S` — Block structure and rewards
-- `address_encode.S` — Base32 address logic
+- `address_encode.S` — (to be implemented) logic to decode Base32 `ENCODED_BODY`, extracting chain ID, object ID, and type
 - `constants.S` — Chain-wide parameters
 
 ### `/src/modules/`
-- `object_create.S` — Create token, chain, smallchain
+- `object_create.S` — Create token, smallchain or NFT. Smallchains are created as enhanced tokens by setting specific flags and attaching modular logic. Mainchain is predefined and not created here.
 - `object_transfer.S` — Transfer handler
 - `object_registry.S` — Registry for chain/token
 - `object_properties.S` — Flags and features (mintable, dex_enabled...)
 - `staking_main.S` — Staking rewards and consensus logic
-- `fee_logic.S` — Custom fee structure for token-specific fees
+- `fee_logic.S` — Custom fee logic for token-specific adjustments (optional). Global fees are defined in `fees.S` and used by default; this module is used only if a token overrides the base fee behavior.
 - `dex_logic.S` — Base DEX matching
 - `dex_liquidity_mint.S` — Magical DEX liquidity injection
 - `vote_reputation.S` — Event-based reputation updates
@@ -169,12 +192,16 @@ Neurinochain uses a strict and expandable ID structure to identify all objects i
 - `fees.S` — Global fee logic for all operations (chain creation, token issue, transfers, voting, DEX, etc.)
 
 ### `/src/custom/`
-- `loader.S`, `verifier.S` — Allow smallchains to register and expose personal logic
-- All user code is seen on the network as `00_00_OBJ_...`
+- (planned) Modules to allow smallchains to register and expose personal logic.
+- Not yet implemented. Future versions will load external logic per chain, but all modules will be internally referenced using only the `ENCODED_BODY`. The legacy `00_00_OBJ_` prefix is no longer used.
+- User-defined modules (once supported) will be visible on the network as `00_00_OBJ_...`, but until `loader.S` and `verifier.S` are implemented, this behavior is reserved for future support of custom logic
 
 ### `/webapp/`
 - `index.html` — Browser wallet/DEX frontend
 - `wallet.js`, `wasm_loader.js`, `style.css`
+- `assets/chains/` — Optional SVG or PNG logos for smallchains
+- `assets/tokens/` — Logos for tokens
+- `assets/obj/` — Logos for custom user modules
 
 ---
 
@@ -192,5 +219,4 @@ MIT — free to use, modify, extend or fork.
 - Edit `.S` modules and rebuild
 
 Pull requests are welcome!
-
 
