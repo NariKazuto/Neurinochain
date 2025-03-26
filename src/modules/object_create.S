@@ -59,7 +59,20 @@ _object_create:
     ;     Output:
     ;       r0 = pointer to ENCODED_BODY (Base32 string)
 
-    ; TODO: prepare payload and call _object_encode
+    ; Generate temporary payload (example: name + supply + decimals)
+    ; Assume these are preloaded in memory at address r6 with length r7
+    ; r6 = payload pointer
+    ; r7 = payload length
+
+    mov r4, r6          ; payload pointer
+    mov r5, r7          ; payload length
+
+    ; Set example chain_id, object_id, type_id
+    mov r1, #0x0000     ; chain_id = mainchain
+    mov r2, #0x0100     ; object_id = 0x0100 (example value)
+    mov r3, #0x0001     ; type_id = token (could vary by object type)
+
+    bl _object_encode   ; result in r0 → ENCODED_BODY (Base32)
     ; TODO: store r0 as object ID
 
 
@@ -71,6 +84,10 @@ _object_create:
 
     ; TODO: store object in registry
 
+
+    ; -----------------------------------------
+    ; Done
+    ret
 
     ; -----------------------------------------
     ; Done
