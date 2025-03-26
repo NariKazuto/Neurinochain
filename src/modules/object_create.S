@@ -47,13 +47,20 @@ _object_create:
 
 
     ; -----------------------------------------
-    ; 3. Compute Object ID (ENCODED_BODY)
+    ; 3. Encode Object ID (ENCODED_BODY)
     ; -----------------------------------------
-    ; - SHA-512 hash of normalized parameters
-    ; - Encode result in Base32
+    ; - Use object_encode.S:
+    ;     Inputs:
+    ;       r1 = chain_id
+    ;       r2 = object_id (can be fixed or random per chain)
+    ;       r3 = type_id
+    ;       r4 = pointer to payload buffer (hash or metadata)
+    ;       r5 = payload length
+    ;     Output:
+    ;       r0 = pointer to ENCODED_BODY (Base32 string)
 
-    ; TODO: prepare input buffer
-    ; TODO: call sha512 → base32 encoder
+    ; TODO: prepare payload and call _object_encode
+    ; TODO: store r0 as object ID
 
 
     ; -----------------------------------------
@@ -68,4 +75,3 @@ _object_create:
     ; -----------------------------------------
     ; Done
     ret
-
