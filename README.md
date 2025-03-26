@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/nuologo256.png" alt="Neurinochain logo" width="128" />
-</p>
+<img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/nuologo256.png" alt="Neurinochain logo" width="128" />
+
 
 # 🧠 Neurinochain
 
