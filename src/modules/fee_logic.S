@@ -1,13 +1,19 @@
 ;
 ; fee_logic.S — Custom Fee Logic per Transaction Type or Chain
 ; -------------------------------------------------------------
-; Allows dynamic fee enforcement per object, chain, module or rule.
-; Fees are:
-;  - Required for all txs (except genesis)
-;  - Measured in NEU (10^18 units)
-;  - Can be static, minimum, or calculated
+; This module validates that a transaction has paid an acceptable fee.
 ;
-; Used by tx verifiers and block reward logic.
+; Base fee thresholds are defined in `fees.S`.
+; This module DOES NOT handle token-level custom fees (those belong in a separate module).
+;
+; Input:
+;   r0 = object_id (target token or chain)
+;   r1 = provided_fee (uint128)
+;   r2 = tx_type       (uint8 or uint16)
+;
+; Output:
+;   r0 = 1 if fee is valid
+;   r0 = 0 if fee is rejected (too low)
 ;
 
 .section .text
@@ -15,17 +21,25 @@
 
 _validate_fee:
 
-    ; Input: r0 = object_id (target token/chain)
-    ;        r1 = provided_fee
-    ;        r2 = tx_type
-    ; Output: r0 = 1 if valid, 0 if rejected
+    ; -----------------------------------------
+    ; 1. Lookup base fee for this tx type
+    ; -----------------------------------------
+    ; Call into `fees.S` with tx_type → returns r3 = required_fee
 
-    ; TODO: lookup fee policy for object (object_registry)
-    ; TODO: check minimum base fee (global or per-type)
-    ; TODO: apply multiplier if tx_type requires
+    mov r0, r2          ; tx_type → r0
+    bl _get_base_fee    ; returns r3 = required fee
 
-    ; Example logic:
-    ; if r1 >= required_fee → return 1
-    ; else → return 0
+    ; -----------------------------------------
+    ; 2. Compare provided_fee (r1) >= required_fee (r3)
+    ; -----------------------------------------
+    cmp r1, r3
+    bge fee_ok
 
+fee_fail:
+    mov r0, #0
     ret
+
+fee_ok:
+    mov r0, #1
+    ret
+
