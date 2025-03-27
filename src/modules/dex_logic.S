@@ -10,22 +10,67 @@
 ; - Not tied to any wallet or address
 ; - Validated locally (deterministic and universal)
 ;
-; Example:
-;   Every 2880 blocks:
-;     - NEU created = 0.0567% × days × staking_total
-;     - Price = current_price × (1 + 0.000567 × days)
-;     - Appears in DEX as sell order from system pool
-;
 ; These offers are NOT stored in Merkle root
 ; but are enforced by consensus and appear in all clients.
 ;
+
 .section .text
 .global _dex_logic
 
 _dex_logic:
 
-    ; TODO: Normal DEX operations (add order, match, cancel)
-    ; TODO: Inject system sell offers for NEU if current block is multiple of 2880
-    ; TODO: Ensure system offers are calculated, not stored
+    ; --------------------------------------------------
+    ; 1. Validate Token ID and DEX Permissions
+    ; --------------------------------------------------
+    ; Input: r0 = token_id (ENCODED_BODY)
+    ; Output: r1 = metadata pointer or 0
 
+    bl _object_registry_lookup
+    cmp r1, #0
+    beq reject_token_invalid
+
+    ; Check if DEX is enabled (bitflag at offset 49)
+    ldrb r2, [r1, #49]           ; load flags
+    mov r3, #0x02                ; OBJECT_FLAG_DEX_ENABLED = 0x02
+    tst r2, r3
+    beq reject_dex_disabled
+
+    ; --------------------------------------------------
+    ; 2. Inject System NEU Order Every 2880 Blocks
+    ; --------------------------------------------------
+    ; (If token_id == NEU, and block % 2880 == 0)
+
+    ; TODO: load block_height into r4
+    ; TODO: check if r0 == NEU token_id (hardcoded)
+    ; TODO: if (r4 % 2880 == 0) → inject sell offer
+
+    ; Stub logic:
+    ; cmp r4, #2880
+    ; movs r5, r4
+    ; udiv r6, r5, #2880
+    ; mls r7, r6, #2880, r5  ; r7 = r4 % 2880
+    ; cmp r7, #0
+    ; bne skip_system_order
+
+    ; TODO: calculate system quantity and price
+    ; TODO: inject "invisible" order into view
+
+skip_system_order:
+
+    ; --------------------------------------------------
+    ; 3. Process Order Normally (add, match, cancel)
+    ; --------------------------------------------------
+
+    ; TODO: parse tx data: sender, price, quantity
+    ; TODO: match against existing orders
+    ; TODO: update order book in state (if needed)
+
+    ret
+
+reject_token_invalid:
+    ; Token doesn't exist
+    ret
+
+reject_dex_disabled:
+    ; Token not allowed in DEX
     ret
