@@ -62,12 +62,30 @@ _object_create:
     ; r11 = decimals (0–18)
     ; r12 = flags (bitwise)
 
-    ; TODO:
-    ; - copy name to [r6 + 0] (max 30 bytes)
-    ; - copy symbol to [r6 + 30] (max 10 bytes)
-    ; - store supply to [r6 + 40] (8 bytes)
-    ; - store decimals to [r6 + 48] (1 byte)
-    ; - store flags to [r6 + 49] (1 byte)
+    ; Copy name (max 30 bytes)
+    mov r0, r6        ; dest = buffer start
+    mov r1, r8        ; src = name pointer
+    mov r2, #30       ; max length
+    bl memcpy
+
+    ; Copy symbol (max 10 bytes)
+    add r0, r6, #30
+    mov r1, r9
+    mov r2, #10
+    bl memcpy
+
+    ; Store supply (uint64) at offset 40
+    add r0, r6, #40
+    mov r1, r10
+    str r1, [r0]
+
+    ; Store decimals (byte) at offset 48
+    add r0, r6, #48
+    strb r11, [r0]
+
+    ; Store flags (byte) at offset 49
+    add r0, r6, #49
+    strb r12, [r0]
 
     ; Total payload length = 50 bytes
     mov r7, #50
@@ -144,13 +162,10 @@ _object_create:
     ; - Save object metadata, flags, owner, etc.
     ; - Used for validation and UI info
 
-    ; TODO: store object in registry
-
-
-    ; -----------------------------------------
-    ; Done
-    ret
- store object in registry
+    ; Register in object_registry
+    mov r1, r6       ; payload pointer
+    mov r2, r7       ; payload length (50)
+    bl _object_registry_add
 
 
     ; -----------------------------------------
