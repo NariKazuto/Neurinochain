@@ -6,72 +6,81 @@
 
 .section .data
 
-; === Decimal Precision ===
+; === Decimal Precision (for all tokens) ===
 .global DECIMALS
-DECIMALS:              .word 18       ; 18 decimals like Ethereum
+DECIMALS:              .word 18       ; 18 decimals (1 NEU = 10^18 units)
 
-; === Default Fee System ===
-.global BASE_FEE
-.global REPUTATION_VOTE_FEE
-.global DEX_FEE_PERCENT
+; === Default Fee System (used in fees.S) ===
+.global BASE_FEE                  ; Standard base fee for most tx types
+.global REPUTATION_VOTE_FEE      ; Cost per vote in the reputation system
+.global DEX_FEE_PERCENT          ; Fee percentage for DEX transactions
 
-BASE_FEE:              .word 10000000       ; 0.01 NEU
+BASE_FEE:              .word 10000000       ; 0.01 NEU (10^7 atomic units)
 REPUTATION_VOTE_FEE:   .word 100            ; 0.00000100 NEU
-DEX_FEE_PERCENT:       .word 30             ; 0.3% (30 / 10000)
+DEX_FEE_PERCENT:       .word 30             ; 0.3% = 30 / 10000
 
-; === Reputation System ===
+; === Reputation System Parameters ===
 .global MAX_REPUTATION_SCORE
-MAX_REPUTATION_SCORE:  .word 10000          ; Max reputation
+MAX_REPUTATION_SCORE:  .word 10000          ; Reputation is 0 → 10000
 
-; === Block Timing ===
-.global DEFAULT_BLOCK_TIME
-DEFAULT_BLOCK_TIME:    .word 30             ; Seconds per block (mainchain)
+; === Block Timing and Intervals ===
+.global DEFAULT_BLOCK_TIME                  ; Time between blocks
+DEFAULT_BLOCK_TIME:    .word 30             ; 30 seconds per block (mainchain)
+
+.global BLOCK_INTERVAL_SYSTEM_ORDER         ; Interval for system NEU injection
+BLOCK_INTERVAL_SYSTEM_ORDER: .word 2880     ; Every 2880 blocks (≈1 day)
 
 ; === Token Property Flags (bitwise) ===
-.global FLAG_DIVISIBLE
-.global FLAG_BURNABLE
-.global FLAG_MINTABLE
-.global FLAG_TRANSFERABLE
-.global FLAG_CHAIN_ENABLED
+.global FLAG_DIVISIBLE       ; Token has decimals
+.global FLAG_BURNABLE        ; Token can be burned
+.global FLAG_MINTABLE        ; Token can be minted
+.global FLAG_TRANSFERABLE    ; Token can be transferred
+.global FLAG_CHAIN_ENABLED   ; Token is a smallchain
+.global FLAG_DEX_ENABLED     ; Token can be traded on DEX
 
-FLAG_DIVISIBLE:        .word 0x01     ; Can be fractional (uses DECIMALS)
-FLAG_BURNABLE:         .word 0x02     ; Can be burned
-FLAG_MINTABLE:         .word 0x04     ; Can mint more supply
-FLAG_TRANSFERABLE:     .word 0x08     ; Can be transferred
-FLAG_CHAIN_ENABLED:    .word 0x10     ; Acts as a smallchain
+FLAG_DIVISIBLE:        .word 0x01     ; 1 << 0
+FLAG_BURNABLE:         .word 0x02     ; 1 << 1
+FLAG_MINTABLE:         .word 0x04     ; 1 << 2
+FLAG_TRANSFERABLE:     .word 0x08     ; 1 << 3
+FLAG_CHAIN_ENABLED:    .word 0x10     ; 1 << 4
+FLAG_DEX_ENABLED:      .word 0x20     ; 1 << 5
 
-; === Reserved IDs ===
+; === Reserved IDs for core modules or system tokens ===
 .global CHAIN_ID_MAIN
 .global CHAIN_ID_SYSTEM
 .global TOKEN_ID_NEUR
 .global OBJECT_ID_REPUTATION_MODULE
 
-CHAIN_ID_MAIN:         .word 0x00     ; Mainchain
-CHAIN_ID_SYSTEM:       .word 0xFF     ; Reserved for system-level modules
+CHAIN_ID_MAIN:         .word 0x00     ; ID for the mainchain
+CHAIN_ID_SYSTEM:       .word 0xFF     ; Reserved for system modules
+TOKEN_ID_NEUR:         .word 0x00     ; Main token (NEUR)
+OBJECT_ID_REPUTATION_MODULE: .word 0xF0  ; ID for internal reputation logic
 
-TOKEN_ID_NEUR:         .word 0x00     ; Main NEUR token
-OBJECT_ID_REPUTATION_MODULE: .word 0xF0  ; Reputation system module
+; === Optional: Hardcoded Base32 of NEUR Token ID (for DEX use) ===
+.global ENCODED_BODY_NEUR
+ENCODED_BODY_NEUR: .asciz "MFZXKZ3WOBSWIIDTNF2HI3DJNZTGS4TDL5XGIY3JLFBQ"
 
-; === Error Codes ===
+; === Error Codes (for system-level failure reporting) ===
 .global ERR_INVALID_SIGNATURE
 .global ERR_UNAUTHORIZED
 .global ERR_OBJECT_NOT_FOUND
 .global ERR_INVALID_FLAGS
 .global ERR_INSUFFICIENT_FUNDS
 
-ERR_INVALID_SIGNATURE:     .word 0x01
-ERR_UNAUTHORIZED:          .word 0x02
-ERR_OBJECT_NOT_FOUND:      .word 0x03
-ERR_INVALID_FLAGS:         .word 0x04
-ERR_INSUFFICIENT_FUNDS:    .word 0x05
+ERR_INVALID_SIGNATURE:     .word 0x01   ; Signature invalid or missing
+ERR_UNAUTHORIZED:          .word 0x02   ; Not allowed to execute
+ERR_OBJECT_NOT_FOUND:      .word 0x03   ; Token or wallet doesn't exist
+ERR_INVALID_FLAGS:         .word 0x04   ; Flag mismatch
+ERR_INSUFFICIENT_FUNDS:    .word 0x05   ; Not enough tokens/balance
 
-; === Limits ===
+; === Limits and Capacities ===
 .global MAX_TX_SIZE
 .global MAX_TOKEN_SUPPLY
 .global MAX_CHAIN_DEPTH
 .global MAX_OBJECTS_PER_CHAIN
 
-MAX_TX_SIZE:               .word 1024         ; bytes
-MAX_TOKEN_SUPPLY:          .word 0xFFFFFFFF   ; 4.2B max for lightweight chains
-MAX_CHAIN_DEPTH:           .word 5            ; Max nested chains (future)
-MAX_OBJECTS_PER_CHAIN:     .word 65536        ; Max 2^16 per chain
+MAX_TX_SIZE:               .word 1024         ; Max bytes per transaction
+MAX_TOKEN_SUPPLY:          .word 0xFFFFFFFF   ; Max 4.2B for lightweight tokens
+MAX_CHAIN_DEPTH:           .word 5            ; Nested chains (reserved)
+MAX_OBJECTS_PER_CHAIN:     .word 65536        ; 2^16 max tokens per chain
+
