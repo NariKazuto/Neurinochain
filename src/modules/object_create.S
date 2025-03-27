@@ -43,6 +43,24 @@ _object_create:
     ; - Name (for UI), supply, decimals
 
     ; TODO: load and validate input fields
+
+    ; Example hardcoded values (for testing):
+    ; r8 = pointer to name (string), r9 = supply (int), r10 = decimals (int)
+    ; Allocate temporary buffer in r6, length in r7
+
+    ; Allocate 64 bytes buffer
+    mov r7, #64
+    bl malloc       ; result in r6
+
+    ; Copy name (assume 16 bytes), supply (8 bytes), decimals (1 byte)
+    ; For example purposes only, real code must serialize properly
+
+    ; TODO: copy [r8] into [r6] (name)
+    ; TODO: store r9 into [r6+16] (supply)
+    ; TODO: store r10 into [r6+24] (decimals)
+
+    ; r6 = pointer to payload
+    ; r7 = length = 32 (assumed name + supply + decimals)
     ; TODO: reject conflicting settings (e.g. NFT with >1 supply)
 
 
@@ -89,6 +107,3 @@ _object_create:
     ; Done
     ret
 
-    ; -----------------------------------------
-    ; Done
-    ret
