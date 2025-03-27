@@ -45,6 +45,34 @@ _object_create:
     ; TODO: load and validate input fields
 
     ; Expected fields:
+    ; - name: max 30 chars (null-padded)
+    ; - symbol: max 10 chars
+    ; - supply: 8 bytes (uint64)
+    ; - decimals: 1 byte (0–18)
+    ; - flags: 1 byte (bit 0 = mintable, bit 1 = burnable, etc.)
+
+    ; Allocate 64 bytes buffer for payload
+    mov r7, #64
+    bl malloc         ; r6 = buffer pointer
+
+    ; Inputs assumed:
+    ; r8 = name pointer
+    ; r9 = symbol pointer
+    ; r10 = supply (int)
+    ; r11 = decimals (0–18)
+    ; r12 = flags (bitwise)
+
+    ; TODO:
+    ; - copy name to [r6 + 0] (max 30 bytes)
+    ; - copy symbol to [r6 + 30] (max 10 bytes)
+    ; - store supply to [r6 + 40] (8 bytes)
+    ; - store decimals to [r6 + 48] (1 byte)
+    ; - store flags to [r6 + 49] (1 byte)
+
+    ; Total payload length = 50 bytes
+    mov r7, #50
+
+    ; Expected fields:
     ; - Name (max 30 bytes, padded or truncated)
     ; - Symbol (max 10 bytes)
     ; - Supply (8 bytes int)
@@ -117,6 +145,12 @@ _object_create:
     ; - Used for validation and UI info
 
     ; TODO: store object in registry
+
+
+    ; -----------------------------------------
+    ; Done
+    ret
+ store object in registry
 
 
     ; -----------------------------------------
