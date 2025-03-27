@@ -44,23 +44,39 @@ _object_create:
 
     ; TODO: load and validate input fields
 
-    ; Example hardcoded values (for testing):
-    ; r8 = pointer to name (string), r9 = supply (int), r10 = decimals (int)
-    ; Allocate temporary buffer in r6, length in r7
+    ; Expected fields:
+    ; - Name (max 30 bytes, padded or truncated)
+    ; - Symbol (max 10 bytes)
+    ; - Supply (8 bytes int)
+    ; - Decimals (1 byte)
+    ; - Infinite flag (1 byte, 0 or 1)
 
-    ; Allocate 64 bytes buffer
-    mov r7, #64
-    bl malloc       ; result in r6
+    ; Allocate buffer for 50 bytes (30+10+8+1+1)
+    mov r7, #50
+    bl malloc        ; r6 = pointer to buffer
 
-    ; Copy name (assume 16 bytes), supply (8 bytes), decimals (1 byte)
-    ; For example purposes only, real code must serialize properly
+    ; r8 = pointer to name
+    ; r9 = pointer to symbol
+    ; r10 = supply (int)
+    ; r11 = infinite flag (0 or 1)
 
-    ; TODO: copy [r8] into [r6] (name)
-    ; TODO: store r9 into [r6+16] (supply)
-    ; TODO: store r10 into [r6+24] (decimals)
+    ; Store name (max 30 bytes)
+    ; TODO: copy 30 bytes from [r8] to [r6]
 
-    ; r6 = pointer to payload
-    ; r7 = length = 32 (assumed name + supply + decimals)
+    ; Store symbol (max 10 bytes)
+    ; TODO: copy 10 bytes from [r9] to [r6+30]
+
+    ; Store supply (8 bytes)
+    ; TODO: write r10 to [r6+40]
+
+    ; Store decimals (fixed = 18)
+    mov r12, #18
+    strb r12, [r6, #48]
+
+    ; Store infinite flag (r11)
+    strb r11, [r6, #49]
+
+    ; Payload is at r6, length in r7 = 50
     ; TODO: reject conflicting settings (e.g. NFT with >1 supply)
 
 
