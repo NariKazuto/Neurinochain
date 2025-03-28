@@ -5,7 +5,7 @@
 
 ; Constants
 INITIAL_MIN_STAKE       equ 1000000000000000000   ; 1 NEU in atomic units (10^18)
-STAKING_GROWTH_RATE     equ 1000567               ; Represents 1.000567 (scaled by 1e6)
+STAKING_GROWTH_RATE     equ 1                     ; Placeholder, real growth via pow()
 BLOCKS_PER_DAY          equ 2880                  ; 1 day worth of blocks (30s per block)
 STANDARD_REWARD         equ 10000000000000000000  ; 10 NEU per block
 
@@ -44,16 +44,19 @@ update_staking_minimum:
 ; ------------------------------------------------------------------------------
 global distribute_block_rewards
 distribute_block_rewards:
-    ; TODO:
-    ; 1. Calculate total stake from eligible nodes
+    ; Pseudo-code logic:
+    ; 1. Load current minimum stake
     ; 2. For each staker:
-    ;    - if stake >= staking_minimum_current:
-    ;        receive proportional reward
-    ;    - else:
-    ;        receive reduced reward by growth percentage
-    ; 3. Calculate forger bonus: +10% of its eligible share + unclaimed difference
-    ; 4. Add STANDARD_REWARD + r1 (fees) to total distributed
-    ; 5. Write directly into spendable balances (not staking balance)
+    ;    - If stake >= minimum:
+    ;        reward_share = stake / total_stake
+    ;    - Else:
+    ;        reward_share = stake / total_stake * reduction_factor
+    ; 3. Sum all real_reward_shares
+    ; 4. Assign base rewards (STANDARD_REWARD + total_fee_collected)
+    ; 5. Calculate unclaimed portion
+    ; 6. Forger gets +10% of their share + unclaimed
+    ; 7. Write amounts to spendable balances (not staked)
+    ; TODO: Implement real loop over staking pool
     ret
 
 
@@ -70,5 +73,3 @@ validate_staker_eligibility:
     movcs r0, #1     ; eligible
     movcc r0, #0     ; not eligible
     ret
-
-    ; Normal share logic continues here
