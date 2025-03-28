@@ -29,7 +29,9 @@ neurinochain/
 │   │   ├── marketplace_store.S
 │   │   ├── royalty_logic.S
 │   │   ├── pruning.S
-│   │   └── merkle_storage.S
+│   │   ├── merkle_storage.S
+│   │   ├── offline_transfer.S
+│   │   └── offline_sync.S
 │   ├── crypto/
 │   │   ├── ed25519.S
 │   │   ├── sha512.S
@@ -76,7 +78,7 @@ neurinochain/
 ## ⚙️ Folder Usage Explained
 
 - **`src/core/`**: Core blockchain initialization, address encoding, and block structure logic.
-- **`src/modules/`**: Token and chain logic, DEX, staking, transfers, reputation, marketplace, pruning, and storage management.
+- **`src/modules/`**: Token and chain logic, DEX, staking, transfers, reputation, marketplace, pruning, offline transactions, and storage management.
 - **`src/crypto/`**: Cryptographic operations, digital signatures, hashing.
 - **`src/fees/`**: Global fee definitions.
 - **`src/custom/`**: Future extensibility for custom smallchain modules.
@@ -96,6 +98,7 @@ neurinochain/
 - **`staking_main.S`**: Staking rewards and consensus mechanism.
 - **`dex_logic.S` & `dex_liquidity_mint.S`**: Decentralized exchange core and liquidity mechanisms.
 - **`vote_reputation.S` & `auto_reputation.S`**: Reputation scoring and updating.
+- **`offline_transfer.S` & `offline_sync.S`**: Offline fund transfers via Bluetooth and synchronization logic.
 
 ---
 
