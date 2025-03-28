@@ -2,8 +2,9 @@
 
 This technical documentation provides a detailed breakdown of the file structure, folder hierarchy, and specific file extensions utilized by the Neurinochain blockchain.
 
-## 📁 Project Structure
+---
 
+## 📁 Project Structure
 ```
 neurinochain/
 ├── docs/
@@ -61,66 +62,62 @@ neurinochain/
 ---
 
 ## 📄 File Types & Extensions
-
-| Extension | Description | Purpose |
-|-----------|-------------|---------|
-| `.S` | Assembly source files | Core logic, crypto algorithms, module implementations |
-| `.html` | HyperText Markup Language | Browser UI interface |
-| `.js` | JavaScript | WASM loader, wallet logic |
-| `.css` | Cascading Style Sheets | Webapp styling |
-| `.wasm` | WebAssembly Binary | Compiled Assembly modules for browser execution |
-| `.svg`, `.png` | Images and icons | UI logos for chains, tokens, and objects |
-| `.md` | Markdown Documentation | Guides, technical specs |
-| `.sh` | Shell scripts | Tools, builders, dev utilities |
+| Extension | Description             | Purpose                                       |
+|-----------|-------------------------|-----------------------------------------------|
+| .S        | Assembly source files   | Core logic, crypto algorithms, module code    |
+| .html     | HyperText Markup        | Browser UI interface                          |
+| .js       | JavaScript              | WASM loader, wallet logic                     |
+| .css      | Cascading Style Sheets  | Webapp styling                                |
+| .wasm     | WebAssembly Binary      | Compiled Assembly modules for browser use     |
+| .svg/.png | Images and icons        | UI logos for chains, tokens, objects          |
+| .md       | Markdown Documentation  | Guides, technical specs                       |
+| .sh       | Shell scripts           | Tools, builders, dev utilities                |
 
 ---
 
 ## ⚙️ Folder Usage Explained
-
-- **`src/core/`**: Core blockchain initialization, address encoding, and block structure logic.
-- **`src/modules/`**: Token and chain logic, DEX, staking, transfers, reputation, marketplace, pruning, offline transactions, and storage management.
-- **`src/crypto/`**: Cryptographic operations, digital signatures, hashing.
-- **`src/fees/`**: Global fee definitions.
-- **`src/custom/`**: Future extensibility for custom smallchain modules.
-- **`wasm/`**: Compiled modules in WebAssembly format for browser execution.
-- **`webapp/`**: Front-end client wallet and DEX running entirely in browser.
-- **`tools/`**: Development utilities for compiling, testing, key generation.
-- **`docs/`**: Technical specifications, user and developer guides.
+- **src/core/**: Core blockchain logic, initialization, block definitions.
+- **src/modules/**: DEX, staking, transfers, smallchains, reputation, marketplace, pruning.
+- **src/crypto/**: Ed25519 signatures, SHA-512, Keccak, arithmetic.
+- **src/fees/**: Configurable global fees and reward logic.
+- **src/custom/**: Reserved for future smallchain extensions.
+- **wasm/**: Compiled modules for WebAssembly runtime.
+- **webapp/**: Wallet, DEX, and UI interface entirely in-browser.
+- **tools/**: Scripts for development, compilation, testing.
+- **docs/**: Markdown-based documentation and guides.
 
 ---
 
 ## 🔑 Key Assembly Files & Their Roles
-
-- **`mainchain_init.S`**: Boot and initial blockchain state.
-- **`block_format.S`**: Block data structure and reward calculation.
-- **`address_encode.S`**: ID encoding/decoding (Base32).
-- **`object_create.S`**: Token, NFT, and smallchain creation logic.
-- **`staking_main.S`**: Staking rewards and consensus mechanism.
-- **`dex_logic.S` & `dex_liquidity_mint.S`**: Decentralized exchange core and liquidity mechanisms.
-- **`vote_reputation.S` & `auto_reputation.S`**: Reputation scoring and updating.
-- **`offline_transfer.S` & `offline_sync.S`**: Offline fund transfers via Bluetooth and synchronization logic.
+- **mainchain_init.S**: Blockchain boot and genesis setup.
+- **block_format.S**: Defines block structure, max tx per block (configurable), and reward formatting.
+- **staking_main.S**: Handles staking rules, consensus, and distribution.
+- **dex_logic.S / dex_liquidity_mint.S**: Core logic for DEX and liquidity management. Active by default on mainchain.
+- **fee_logic.S / fees.S**: Calculation and enforcement of all chain-related fees.
+- **vote_reputation.S / auto_reputation.S**: Trust system based on user activity.
+- **offline_transfer.S / offline_sync.S**: Modules for secure offline fund exchange.
+- **object_create.S**: Token, NFT, and smallchain creation logic.
 
 ---
 
 ## 🚀 Compiling & Running Neurinochain
-
 To compile WebAssembly modules:
-
 ```bash
 cd neurinochain/tools
 ./wasm_builder.sh
 ```
-
-Open `webapp/index.html` in your browser to interact directly with Neurinochain.
+Then open:
+```bash
+webapp/index.html
+```
+Interact with the wallet and DEX directly in your browser.
 
 ---
 
 ## 📚 Contributing
+- Fork and clone the repository.
+- Make changes to `.S` modules.
+- Test using `localmain` mode (simulated 10-node environment).
+- Submit pull requests with clear descriptions.
 
-- Fork and clone this repository.
-- Make changes to `.S` Assembly modules.
-- Test locally using `localmain` mode.
-- Submit pull requests clearly documenting changes.
-
-Contributions are encouraged to expand accessibility and optimize performance for low-powered devices.
-
+**Goal:** Create accessible blockchain infrastructure that scales to slow networks and low-end devices (e.g., 1.5 GHz CPU, 1 GB RAM DDR2).
