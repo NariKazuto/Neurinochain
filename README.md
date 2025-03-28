@@ -1,7 +1,5 @@
 <img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/neulogo256.png" alt="Neurinochain logo" width="128" />
 
-![Neurinochain logo](nuologo256.png)
-
 # 🧠 Neurinochain
 
 **Neurinochain** is a fully modular blockchain written entirely in Assembly, designed specifically for extreme efficiency, compatibility with low-powered hardware (including old smartphones and Raspberry Pi), and usability via web browsers without installations.
@@ -29,6 +27,7 @@ Neurinochain is built explicitly to empower users in developing countries or eco
 - **Invisible Staking Rewards**: Rewards appear directly in wallets, reducing complexity for new users.
 - **Automatic Reputation System**: Protects against spam and fraud, promoting fairness and trust.
 - **Flexible Smallchains**: Community-driven, modular, and easily expandable blockchain modules.
+- **Offline Fund Transfers**: Secure offline transactions via Bluetooth, synchronized automatically when online.
 
 ---
 
@@ -114,5 +113,6 @@ Neurinochain runs efficiently on:
 ---
 
 Neurinochain’s goal is simple yet powerful: deliver decentralized financial tools to anyone, regardless of location, economic status, or technical capability.
+
 
 
