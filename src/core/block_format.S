@@ -1,4 +1,3 @@
-;
 ; block_format.S — Mainchain Block Structure Definition
 ; -----------------------------------------------------
 ; Defines how blocks are structured in Neurinochain mainchain.
@@ -6,7 +5,6 @@
 ;
 ; This structure is used to validate, store and propagate blocks
 ; without relying on traditional transaction logs for rewards.
-;
 
 .section .text
 .global _block_format
@@ -17,13 +15,15 @@ _block_format:
     ; Block Header
     ; -----------------------------------------
     ; - timestamp (u64)
-    ; - previous_block_hash (sha512)
+    ; - previous_block_hash (sha256)
     ; - merkle_root (of normal transactions only)
     ; - forger_public_key (32 bytes)
     ; - block_signature (Ed25519)
+    ; - tx_count (u32) — number of transactions in block
 
     ; TODO: Define memory layout for the fields
     ; TODO: Set pointer offsets for validation & serialization
+    ; TODO: Enforce MAX_TX_PER_BLOCK per chain config
 
 
     ; -----------------------------------------
@@ -50,5 +50,3 @@ _block_format:
 
     ; Return (for now, placeholder)
     ret
-
-
