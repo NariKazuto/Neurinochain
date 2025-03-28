@@ -1,67 +1,74 @@
-reward_loop:
-    bl get_node_stake_by_index       ; r1 = stake
-    bl get_node_sync_flag_by_index   ; r2 = 1/0
-    cmp r2, #0
-    beq skip_this_node
+; staking_main.S - Mainchain Staking and Block Rewards
+; ======================================================
+; Handles staking eligibility, reward distribution, and staking difficulty growth.
+; This module runs only on the mainchain.
 
-    ; Get current dynamic minimum stake
-    bl get_dynamic_minimum_stake     ; r6 = stake_min
+; Constants
+INITIAL_MIN_STAKE       equ 1000000000000000000   ; 1 NEU in atomic units (10^18)
+STAKING_GROWTH_RATE     equ 1000567               ; Represents 1.000567 (scaled by 1e6)
+BLOCKS_PER_DAY          equ 2880                  ; 1 day worth of blocks (30s per block)
+STANDARD_REWARD         equ 10000000000000000000  ; 10 NEU per block
 
-    ; Compare r1 (stake) vs r6 (minimum stake)
-    cmp r1, r6
-    bge calculate_share              ; no penalty needed
+section .data
+current_epoch_day       dq 0                      ; days since genesis
+staking_minimum_current dq INITIAL_MIN_STAKE      ; updated minimum stake amount
 
-    ; ---------------------------
-    ; Apply progressive penalty
-    ; ---------------------------
+global update_staking_minimum
+; ------------------------------------------------------------------------------
+; update_staking_minimum
+; Updates staking_minimum_current = INITIAL_MIN_STAKE * (1.000567 ^ epoch_days)
+; Input: r0 = current block height
+; Output: staking_minimum_current (in memory)
+; ------------------------------------------------------------------------------
+update_staking_minimum:
+    ; Calculate current day: epoch_days = block_height / BLOCKS_PER_DAY
+    mov r1, BLOCKS_PER_DAY
+    udiv r2, r0, r1
+    str r2, [current_epoch_day]
 
-    ; Get how many blocks since node was last above threshold
-    ; → returns days_penalized = floor((current_height - last_ok_block) / 2880)
-    bl get_penalty_duration_for_node   ; r7 = number of periods penalized
+    ; staking_min = INITIAL_MIN_STAKE * (1.000567 ^ epoch_days)
+    ; Note: Floating point exponentiation must be simulated or precomputed
+    ; TODO: Implement fixed-point pow approximation or lookup table
 
-    ; Base = 0.0567% = 567 / 1,000,000
-    ; penalty_factor = (1 - 0.000567)^r7
-    ; Approximated with integer logic:
-    ; multiplier = (1000000 - 567)^r7
+    ; Placeholder: keep staking_minimum_current constant for now
+    mov r3, INITIAL_MIN_STAKE
+    str r3, [staking_minimum_current]
+    ret
 
-    ; Let's assume 1-day penalty: 999433
-    ; If r7 = 0 → multiplier = 1000000
-    ; r3 = raw share (proportional)
 
-    mov r10, #1000000
-    mov r11, #567
-    sub r12, r10, r11           ; r12 = 999433
+; ------------------------------------------------------------------------------
+; distribute_block_rewards
+; Distributes rewards to active stakers and bonus to forger
+; Input: r0 = forger_id, r1 = total_fee_collected, r2 = staking_pool[]
+; Output: writes NEU to balances accordingly
+; ------------------------------------------------------------------------------
+global distribute_block_rewards
+distribute_block_rewards:
+    ; TODO:
+    ; 1. Calculate total stake from eligible nodes
+    ; 2. For each staker:
+    ;    - if stake >= staking_minimum_current:
+    ;        receive proportional reward
+    ;    - else:
+    ;        receive reduced reward by growth percentage
+    ; 3. Calculate forger bonus: +10% of its eligible share + unclaimed difference
+    ; 4. Add STANDARD_REWARD + r1 (fees) to total distributed
+    ; 5. Write directly into spendable balances (not staking balance)
+    ret
 
-    ; raise to power r7 (simplified loop)
-    mov r13, #1                 ; multiplier = 1
-penalty_loop:
-    cmp r7, #0
-    beq end_penalty_loop
-    mul r13, r13, r12
-    udiv r13, r13, r10          ; normalize
-    sub r7, r7, #1
-    b penalty_loop
-end_penalty_loop:
 
-    ; Now apply penalty to base share
-    mul r3, r3, r13
-    udiv r3, r3, r10            ; penalized share now in r3
+; ------------------------------------------------------------------------------
+; validate_staker_eligibility
+; Checks if wallet is eligible for staking based on current minimum
+; Input: r0 = stake_amount
+; Output: r0 = 1 if eligible, 0 if not
+; ------------------------------------------------------------------------------
+global validate_staker_eligibility
+validate_staker_eligibility:
+    ldr r1, [staking_minimum_current]
+    cmp r0, r1
+    movcs r0, #1     ; eligible
+    movcc r0, #0     ; not eligible
+    ret
 
-    ; Store penalty difference to give to forger
-    ; penalty_diff = original_share - penalized_share
-    mov r14, r3
-    ; We must subtract from original (recalculate unpenalized r3)
-    mul r15, r1, #1000000
-    udiv r15, r15, r9
-    sub r16, r15, r14           ; r16 = penalty_diff share units
-
-    ; Convert penalty_diff to actual NEU value
-    mov r4, #10000000000000000000     ; 10 NEU
-    mul r17, r16, r4
-    udiv r17, r17, #1000000
-
-    ; Add to forger's pending bonus
-    bl credit_forger_penalty_bonus    ; r17 = NEU to credit
-
-calculate_share:
     ; Normal share logic continues here
