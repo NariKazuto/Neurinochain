@@ -12,7 +12,7 @@
 
 ; Configuration Constants
 MAX_DECIMALS            equ 18             ; Maximum number of decimals
-STANDARD_FEE_PERCENTAGE equ 0.0000001      ; 0.00001% expressed as decimal
+STANDARD_FEE_PERCENTAGE equ 0.00008      ; 0.00001% expressed as decimal
 DEX_FEE_PERCENT         equ 30             ; Example: 30 means 0.3%
 SMALLCHAIN_CREATION_COST equ 25            ; Cost to create a smallchain (NEU)
 TOKEN_CREATION_COST     equ 1              ; Cost to create a token (NEU)
