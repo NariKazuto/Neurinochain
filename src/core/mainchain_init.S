@@ -1,7 +1,7 @@
 ; --------------------------------------------
 ; File: /src/core/mainchain_init.S
 ; Description: Initializes the Neurinochain mainchain (genesis block)
-; Author: Neurinochain Project
+; Author: Union of the human intellect
 ; --------------------------------------------
 
 .section .text
@@ -14,7 +14,7 @@ mainchain_init:
     mov r0, #0x00              ; chain_id for mainchain
     mov r1, #0x00              ; object_id for main token (NEUR)
     mov r2, #0x00              ; initial reputation level
-    mov r3, #0x1DCD6500        ; initial supply (e.g., 500_000_000 NEU, 18 decimals)
+    mov r3, #0x1DCD6500        ; initial supply (e.g., 1_000_000 NEU, 18 decimals)
 
     ; Call object creation routine (token with chain features)
     ; r0 = chain_id, r1 = object_id, r3 = supply
