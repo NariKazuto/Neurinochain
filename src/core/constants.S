@@ -1,7 +1,7 @@
 ; --------------------------------------------
 ; File: /src/core/constants.S
 ; Description: Global constants for Neurinochain
-; Author: Neurinochain Project
+; Author: Union of the human intellect
 ; --------------------------------------------
 
 .section .data
@@ -10,18 +10,11 @@
 .global DECIMALS
 DECIMALS:              .word 18       ; 18 decimals (1 NEU = 10^18 units)
 
-; === Default Fee System (used in fees.S) ===
-.global BASE_FEE                  ; Standard base fee for most tx types
-.global REPUTATION_VOTE_FEE      ; Cost per vote in the reputation system
-.global DEX_FEE_PERCENT          ; Fee percentage for DEX transactions
-
-BASE_FEE:              .word 10000000       ; 0.01 NEU (10^7 atomic units)
-REPUTATION_VOTE_FEE:   .word 100            ; 0.00000100 NEU
-DEX_FEE_PERCENT:       .word 30             ; 0.3% = 30 / 10000
-
-; === Reputation System Parameters ===
-.global MAX_REPUTATION_SCORE
-MAX_REPUTATION_SCORE:  .word 10000          ; Reputation is 0 → 10000
+; === Reputation System Parameters (automatic, 0–100%) ===
+.global REPUTATION_MAX
+.global REPUTATION_DEFAULT
+REPUTATION_MAX:        .word 100            ; Max reputation = 100%
+REPUTATION_DEFAULT:    .word 100            ; Default starting reputation = 100%
 
 ; === Block Timing and Intervals ===
 .global DEFAULT_BLOCK_TIME                  ; Time between blocks
@@ -83,4 +76,3 @@ MAX_TX_SIZE:               .word 1024         ; Max bytes per transaction
 MAX_TOKEN_SUPPLY:          .word 0xFFFFFFFF   ; Max 4.2B for lightweight tokens
 MAX_CHAIN_DEPTH:           .word 5            ; Nested chains (reserved)
 MAX_OBJECTS_PER_CHAIN:     .word 65536        ; 2^16 max tokens per chain
-
