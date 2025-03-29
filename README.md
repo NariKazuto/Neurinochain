@@ -1,7 +1,5 @@
 <img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/neulogo256.png" alt="Neurinochain logo" width="128" />
 
-![Neurinochain logo](neulogo256.png)
-
 # 🧠 Neurinochain
 
 **Neurinochain** is a modular blockchain optimized for low-powered hardware, slow networks, and fully text-based interfaces. Written entirely in Assembly, it runs without installation via terminal (Linux or Termux on Android), designed for real-world decentralization — not just theoretical.
