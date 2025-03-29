@@ -1,15 +1,13 @@
 # 🔧 Neurinochain Technical Documentation
 
-This technical documentation provides a detailed breakdown of the file structure, folder hierarchy, and specific file extensions utilized by the Neurinochain blockchain.
+This technical documentation provides a detailed breakdown of the file structure, folder hierarchy, and `.S` modules used by the Neurinochain blockchain. It is meant for developers contributing to the project or customizing the stack for deployment.
 
 ---
 
 ## 📁 Project Structure
+
 ```
-neurinochain/
-├── docs/
-│   ├── specs.md
-│   └── guides/
+Neurinochain/
 ├── src/
 │   ├── core/
 │   │   ├── mainchain_init.S
@@ -36,88 +34,120 @@ neurinochain/
 │   ├── crypto/
 │   │   ├── ed25519.S
 │   │   ├── sha512.S
+│   │   ├── sha256.S
 │   │   ├── keccak.S
 │   │   └── field_math.S
 │   ├── fees/
 │   │   └── fees.S
 │   └── custom/
 │       └── (planned custom module loaders)
-├── wasm/
-│   └── (Compiled WASM files)
-├── webapp/
-│   ├── index.html
-│   ├── wallet.js
-│   ├── wasm_loader.js
-│   ├── style.css
+├── cli/
+│   ├── wallet_cli.S
+│   ├── explorer_cli.S
+│   ├── tools/
+│   │   ├── test_fill_buffer.sh
+│   │   └── tx_inspector.sh
 │   └── assets/
 │       ├── chains/
 │       ├── tokens/
 │       └── obj/
-└── tools/
-    ├── wasm_builder.sh
-    ├── keygen.sh
-    └── dev_tools/
+├── docs/
+│   ├── specs.md
+│   └── guides/
+├── build/
+│   └── (compiled output)
 ```
 
 ---
 
 ## 📄 File Types & Extensions
-| Extension | Description             | Purpose                                       |
-|-----------|-------------------------|-----------------------------------------------|
-| .S        | Assembly source files   | Core logic, crypto algorithms, module code    |
-| .html     | HyperText Markup        | Browser UI interface                          |
-| .js       | JavaScript              | WASM loader, wallet logic                     |
-| .css      | Cascading Style Sheets  | Webapp styling                                |
-| .wasm     | WebAssembly Binary      | Compiled Assembly modules for browser use     |
-| .svg/.png | Images and icons        | UI logos for chains, tokens, objects          |
-| .md       | Markdown Documentation  | Guides, technical specs                       |
-| .sh       | Shell scripts           | Tools, builders, dev utilities                |
+
+| Extension | Description                | Purpose                                      |
+|-----------|----------------------------|----------------------------------------------|
+| `.S`      | Assembly source            | Blockchain logic, modules, cryptographic ops |
+| `.sh`     | Shell script               | Build tools, CLI utilities                   |
+| `.md`     | Markdown                   | Documentation and guides                     |
+| `.wasm`   | WebAssembly binary         | Legacy — deprecated                          |
 
 ---
 
-## ⚙️ Folder Usage Explained
-- **src/core/**: Core blockchain logic, initialization, block definitions.
-- **src/modules/**: DEX, staking, transfers, smallchains, reputation, marketplace, pruning.
-- **src/crypto/**: Ed25519 signatures, SHA-512, Keccak, arithmetic.
-- **src/fees/**: Configurable global fees and reward logic.
-- **src/custom/**: Reserved for future smallchain extensions.
-- **wasm/**: Compiled modules for WebAssembly runtime.
-- **webapp/**: Wallet, DEX, and UI interface entirely in-browser.
-- **tools/**: Scripts for development, compilation, testing.
-- **docs/**: Markdown-based documentation and guides.
+## 🔑 Core Assembly Files
+
+### Core Initialization (`src/core/`)
+- `mainchain_init.S`: Boot sequence and init
+- `block_format.S`: Defines block headers and layout
+- `address_encode.S`: Base32 encoding for addresses and IDs
+- `constants.S`: Network parameters
+
+### Crypto Algorithms (`src/crypto/`)
+- `ed25519.S`: Digital signatures
+- `sha512.S`: Hashing
+- `sha256.S`: Hashing (used for block headers)
+- `keccak.S`: Optional hashing for modules
+- `field_math.S`: Low-level math routines
+
+### Blockchain Modules (`src/modules/`)
+- `object_create.S`: Create token/smallchain/NFT
+- `object_transfer.S`: Transfer logic
+- `object_registry.S`: Storage of objects
+- `object_properties.S`: Token/chain config flags
+- `staking_main.S`: Staking and block reward logic
+- `fee_logic.S`: Fee deduction and rules
+- `dex_logic.S`: Decentralized Exchange engine
+- `dex_liquidity_mint.S`: Inflation/market provision
+- `vote_reputation.S`: User voting system
+- `auto_reputation.S`: Automated wallet scoring
+- `marketplace_store.S`: On-chain item sale
+- `royalty_logic.S`: Usage-based token rewards
+- `pruning.S`: Auto-deletion of old chain data
+- `merkle_storage.S`: Temp tx buffer (6 confirmations)
+- `offline_transfer.S`: Send funds offline
+- `offline_sync.S`: Sync offline wallets
+
+### Fee Definitions (`src/fees/`)
+- `fees.S`: Creation cost, fee %, delegation logic
+
+### Custom Hooks (`src/custom/`)
+- Placeholder for chain- or token-specific modules
 
 ---
 
-## 🔑 Key Assembly Files & Their Roles
-- **mainchain_init.S**: Blockchain boot and genesis setup.
-- **block_format.S**: Defines block structure, max tx per block (configurable), and reward formatting.
-- **staking_main.S**: Handles staking rules, consensus, and distribution.
-- **dex_logic.S / dex_liquidity_mint.S**: Core logic for DEX and liquidity management. Active by default on mainchain.
-- **fee_logic.S / fees.S**: Calculation and enforcement of all chain-related fees.
-- **vote_reputation.S / auto_reputation.S**: Trust system based on user activity.
-- **offline_transfer.S / offline_sync.S**: Modules for secure offline fund exchange.
-- **object_create.S**: Token, NFT, and smallchain creation logic.
+## 🖥️ CLI Interface Files (`/cli/`)
+
+- `wallet_cli.S`: User wallet (send, balance)
+- `explorer_cli.S`: View chain data, tx, forger
+- `tools/`: Helper scripts
+  - `test_fill_buffer.sh`: Simulate TX input
+  - `tx_inspector.sh`: Inspect buffer/live state
+- `assets/`: Chain/token metadata for terminal UI
+  - `chains/`: Friendly names, logos (text/icons)
+  - `tokens/`: Token display config
+  - `obj/`: Object aliases and local info
 
 ---
 
-## 🚀 Compiling & Running Neurinochain
-To compile WebAssembly modules:
-```bash
-cd neurinochain/tools
-./wasm_builder.sh
-```
-Then open:
-```bash
-webapp/index.html
-```
-Interact with the wallet and DEX directly in your browser.
+## 🧪 Testing Modes
+
+- `localmain`: Simulates real network with 10 wallets
+- Run staking, sync, pruning, DEX, etc. fully offline
+- Compatible with CLI interface only
 
 ---
 
-## 📚 Contributing
-- Fork and clone the repository.
-- Make changes to `.S` modules.
-- Test using `localmain` mode (simulated 10-node environment).
-- Submit pull requests with clear descriptions.
+## 🧰 Build Tools
 
-**Goal:** Create accessible blockchain infrastructure that scales to slow networks and low-end devices (e.g., 1.5 GHz CPU, 1 GB RAM DDR2).
+- Scripts and Makefiles will be added to `/tools/`
+- WASM compilation deprecated in CLI mode
+
+---
+
+## 👨‍🔧 Contribution Guidelines
+
+- Follow folder/module structure
+- Use Assembly with clear comments
+- Commit modular changes by function
+- Write CLI-usable tools or hooks when possible
+
+---
+
+This documentation evolves with the project — keep it updated!
