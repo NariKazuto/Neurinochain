@@ -1,4 +1,4 @@
-# 🔧 Neurinochain Technical Documentation
+🔧 **Neurinochain Technical Documentation**
 
 This technical documentation provides a detailed breakdown of the file structure, folder hierarchy, and `.S` modules used by the Neurinochain blockchain. It is meant for developers contributing to the project or customizing the stack for deployment.
 
@@ -30,7 +30,10 @@ Neurinochain/
 │   │   ├── pruning.S
 │   │   ├── merkle_storage.S
 │   │   ├── offline_transfer.S
-│   │   └── offline_sync.S
+│   │   ├── offline_sync.S
+│   │   ├── identity_register.S
+│   │   ├── identity_verify.S
+│   │   └── identity_ipfs_link.S
 │   ├── crypto/
 │   │   ├── ed25519.S
 │   │   ├── sha512.S
@@ -60,21 +63,21 @@ Neurinochain/
 
 ---
 
-## 📄 File Types & Extensions
+## 🗋 File Types & Extensions
 
-| Extension | Description                | Purpose                                      |
-|-----------|----------------------------|----------------------------------------------|
-| `.S`      | Assembly source            | Blockchain logic, modules, cryptographic ops |
-| `.sh`     | Shell script               | Build tools, CLI utilities                   |
-| `.md`     | Markdown                   | Documentation and guides                     |
-| `.wasm`   | WebAssembly binary         | Legacy — deprecated                          |
+| Extension | Description          | Purpose                               |
+|-----------|----------------------|---------------------------------------|
+| `.S`      | Assembly source      | Blockchain logic, modules, crypto ops |
+| `.sh`     | Shell script         | Build tools, CLI utilities            |
+| `.md`     | Markdown             | Documentation and guides              |
+| `.wasm`   | WebAssembly binary   | Legacy — deprecated                   |
 
 ---
 
 ## 🔑 Core Assembly Files
 
 ### Core Initialization (`src/core/`)
-- `mainchain_init.S`: Boot sequence and init
+- `mainchain_init.S`: Boot sequence and chain init
 - `block_format.S`: Defines block headers and layout
 - `address_encode.S`: Base32 encoding for addresses and IDs
 - `constants.S`: Network parameters
@@ -103,6 +106,9 @@ Neurinochain/
 - `merkle_storage.S`: Temp tx buffer (6 confirmations)
 - `offline_transfer.S`: Send funds offline
 - `offline_sync.S`: Sync offline wallets
+- `identity_register.S`: Create a digital identity with image or logo hash
+- `identity_verify.S`: Optional verification system by trusted wallets
+- `identity_ipfs_link.S`: Link identities to external IPFS content
 
 ### Fee Definitions (`src/fees/`)
 - `fees.S`: Creation cost, fee %, delegation logic
@@ -112,42 +118,42 @@ Neurinochain/
 
 ---
 
-## 🖥️ CLI Interface Files (`/cli/`)
+## 💻 CLI Interface Files (`/cli/`)
 
 - `wallet_cli.S`: User wallet (send, balance)
 - `explorer_cli.S`: View chain data, tx, forger
-- `tools/`: Helper scripts
-  - `test_fill_buffer.sh`: Simulate TX input
-  - `tx_inspector.sh`: Inspect buffer/live state
-- `assets/`: Chain/token metadata for terminal UI
-  - `chains/`: Friendly names, logos (text/icons)
-  - `tokens/`: Token display config
-  - `obj/`: Object aliases and local info
+
+### Tools
+- `test_fill_buffer.sh`: Simulate TX input
+- `tx_inspector.sh`: Inspect buffer/live state
+
+### Assets
+- `chains/`: Friendly names, logos (text/icons)
+- `tokens/`: Token display config
+- `obj/`: Object aliases and local info
 
 ---
 
 ## 🧪 Testing Modes
 
-- `localmain`: Simulates real network with 10 wallets
+**`localmain`**: Simulates real network with 10 wallets
 - Run staking, sync, pruning, DEX, etc. fully offline
 - Compatible with CLI interface only
 
 ---
 
-## 🧰 Build Tools
+## 🛠️ Build Tools
 
 - Scripts and Makefiles will be added to `/tools/`
-- WASM compilation deprecated in CLI mode
+- WebAssembly compilation deprecated in CLI mode
 
 ---
 
-## 👨‍🔧 Contribution Guidelines
+## 👨‍💻 Contribution Guidelines
 
 - Follow folder/module structure
 - Use Assembly with clear comments
 - Commit modular changes by function
 - Write CLI-usable tools or hooks when possible
 
----
-
-This documentation evolves with the project — keep it updated!
+> This documentation evolves with the project — keep it updated!
