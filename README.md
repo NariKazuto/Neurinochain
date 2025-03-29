@@ -1,8 +1,10 @@
 <img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/neulogo256.png" alt="Neurinochain logo" width="128" />
 
+![Neurinochain logo](neulogo256.png)
+
 # 🧠 Neurinochain
 
-**Neurinochain** is a modular blockchain optimized for **low-powered hardware**, **slow networks**, and **fully text-based interfaces**. Written entirely in Assembly, it runs without installation via terminal (Linux or Termux on Android), designed for real-world decentralization — not just theoretical.
+**Neurinochain** is a modular blockchain optimized for low-powered hardware, slow networks, and fully text-based interfaces. Written entirely in Assembly, it runs without installation via terminal (Linux or Termux on Android), designed for real-world decentralization — not just theoretical.
 
 ---
 
@@ -14,7 +16,7 @@ Neurinochain exists to serve users in:
 - Areas with slow or intermittent internet
 - Devices with minimal specs (Android Go, Raspberry Pi, etc.)
 
-We believe blockchain must run **anywhere, on anything**.
+> We believe blockchain must run anywhere, on anything.
 
 ---
 
@@ -31,42 +33,44 @@ We believe blockchain must run **anywhere, on anything**.
 
 ---
 
-## 📟 How It Works
+## 📿 How It Works
 
 - 🧱 Blocks every 30 seconds
 - 💸 Fees: 0.00008% of transfer
-- ⚡ 3000 tx/block (configurable)
+- ⚡️ 3000 tx/block (configurable)
 - 🔐 Ed25519 signatures + SHA-256 headers
 - ♻️ Merkle root saved, all tx deleted after 6 confirmations
 
 ---
 
-## 🧰 What You Need
+## 🧠 What You Need
 
-### Minimum (basic participation):
+**Minimum (basic participation):**
 - CPU: 1.5 GHz (dual-core)
 - RAM: 1 GB DDR2
 - Storage: 500 MB free (eMMC/SSD preferred)
 - Network: 1 Mbps
 
-### Recommended (full node, 3000 tx/block):
+**Recommended (full node, 3000 tx/block):**
 - CPU: 2.4 GHz quad-core
 - RAM: 2 GB+
 - Storage: SSD 2 GB+
 - Network: 10 Mbps down / 5 Mbps up
 
-Runs flawlessly on old PCs, Raspberry Pi, and Android (via Termux).
+> Runs flawlessly on old PCs, Raspberry Pi, and Android (via Termux).
 
 ---
 
-## 🧾 Interface (CLI Only)
+## 📟 Interface (CLI Only)
 
 No web interface. Just fast, intuitive terminal navigation.
 
 - `wallet_cli.S`: send, receive, check balance
 - `explorer_cli.S`: view blocks, tx, forgers, rewards
-- Works with ⌨ keyboard or 📱 touchscreen (Termux)
-- Navigable menu: [↑] [↓] [Enter] [Q] — 100% accessible
+
+Works with ⌨️ keyboard or 📱 touchscreen (Termux)
+
+Navigable menu: `[↑]` `[↓]` `[Enter]` `[Q]` — 100% accessible
 
 ---
 
@@ -89,13 +93,13 @@ Open-source under MIT. Fork, improve, translate, localize.
 ## 🤝 Contribute
 
 We welcome:
+
 - Assembly devs
 - Terminal UI designers
 - Optimizers for low-end hardware
 - Contributors from low-bandwidth regions
 
-Start in `/cli/`, test with `localmain`, and push improvements.
+> Start in `/cli/`, test with `localmain`, and push improvements.
 
----
+Together, let’s make blockchain actually usable — not just for the privileged few.
 
-Together, let’s make blockchain **actually usable** — not just for the privileged few.
