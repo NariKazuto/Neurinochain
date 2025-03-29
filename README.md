@@ -1,114 +1,101 @@
 <img src="https://raw.githubusercontent.com/NariKazuto/Neurinochain/main/neulogo256.png" alt="Neurinochain logo" width="128" />
 
 # 🧠 Neurinochain
-Neurinochain is a fully modular blockchain written entirely in Assembly, designed specifically for extreme efficiency, compatibility with low-powered hardware (including old smartphones and Raspberry Pi), and usability via web browsers without installations.
 
-It provides secure and decentralized financial access to people who lack traditional financial infrastructure, such as bank accounts or reliable internet connections.
-
----
-
-## 🌍 Mission: Financial Inclusion
-Neurinochain is built explicitly to empower users in developing countries or economically disadvantaged regions, where:
-
-- Traditional banking services are unavailable or unreliable.
-- Devices are low-end (e.g., Android Go phones, older hardware).
-- Internet connectivity is slow, expensive, or intermittent.
+**Neurinochain** is a modular blockchain optimized for **low-powered hardware**, **slow networks**, and **fully text-based interfaces**. Written entirely in Assembly, it runs without installation via terminal (Linux or Termux on Android), designed for real-world decentralization — not just theoretical.
 
 ---
 
-## 🚀 Key Features
-- **Fully Browser-Based**: Runs completely in-browser using WebAssembly (WASM) without installation.
-- **Stateless Design**: Only Merkle roots are stored, transactions self-destruct after confirmation.
-- **Ultra-Lightweight**: Assembly-optimized for minimal resource consumption.
-- **Automatic Decentralized Exchange (DEX)**: Integrated in the mainchain by default, optional in other chains.
-- **Invisible Staking Rewards**: Rewards appear directly in wallets, reducing complexity for new users.
-- **Automatic Reputation System**: Protects against spam and fraud, promoting fairness and trust.
-- **Flexible Smallchains**: Community-driven, modular, and easily expandable blockchain modules.
-- **Offline Fund Transfers**: Secure offline transactions via Bluetooth, synchronized automatically when online.
+## 🌍 Our Mission: Financial Access for All
+
+Neurinochain exists to serve users in:
+
+- Regions without reliable banking
+- Areas with slow or intermittent internet
+- Devices with minimal specs (Android Go, Raspberry Pi, etc.)
+
+We believe blockchain must run **anywhere, on anything**.
 
 ---
 
-## 🔧 Optimized for Low-Power Devices
-Neurinochain runs efficiently on:
+## 🚀 Core Features
 
-- Low-end Android devices (Android Go, Android 8 or lower).
-- Raspberry Pi or similar single-board computers.
-- Legacy Linux computers with minimal specs.
+- **Terminal-First Design**: No browser needed — works in text mode
+- **Stateless**: Transactions self-delete after confirmation (no database)
+- **Modular Architecture**: Chains = tokens with enhanced features
+- **CLI Wallet & Explorer**: Interact fully via keyboard or touchscreen
+- **Invisible Rewards**: Staking appears magically in balance
+- **Low Resource Usage**: Under 5 MB RAM for 3000 tx/block
+- **Reputation System**: Built-in wallet/node scoring
+- **Offline Support**: Bluetooth sync, air-gapped transfers
 
-### 🖥️ Hardware Requirements
+---
 
-**Minimum (for basic participation):**
-- CPU: 1.5 GHz (single or dual-core)
+## 📟 How It Works
+
+- 🧱 Blocks every 30 seconds
+- 💸 Fees: 0.00008% of transfer
+- ⚡ 3000 tx/block (configurable)
+- 🔐 Ed25519 signatures + SHA-256 headers
+- ♻️ Merkle root saved, all tx deleted after 6 confirmations
+
+---
+
+## 🧰 What You Need
+
+### Minimum (basic participation):
+- CPU: 1.5 GHz (dual-core)
 - RAM: 1 GB DDR2
-- Storage: 500 MB free (SSD or eMMC recommended)
-- Network: 1 Mbps download/upload
+- Storage: 500 MB free (eMMC/SSD preferred)
+- Network: 1 Mbps
 
-**Recommended (for full node with 3000 tx/block):**
+### Recommended (full node, 3000 tx/block):
 - CPU: 2.4 GHz quad-core
-- RAM: 2 GB or more
-- Storage: SSD, 2 GB+ free
-- Network: ≥ 10 Mbps download, ≥ 5 Mbps upload
+- RAM: 2 GB+
+- Storage: SSD 2 GB+
+- Network: 10 Mbps down / 5 Mbps up
 
-No complex setup required: Simply open a browser and begin.
-
----
-
-## 🧱 Stateless Architecture
-- Transactions are automatically deleted after processing and consensus (51% confirmations).
-- Only current state (Merkle roots) is maintained.
-- No historical data storage is needed, making Neurinochain ideal for devices with minimal storage.
+Runs flawlessly on old PCs, Raspberry Pi, and Android (via Termux).
 
 ---
 
-## 📱 Easy-to-Use Interface
-- Intuitive web-based wallet and exchange (DEX).
-- No software updates or technical knowledge required.
-- Accessible and clear UI suitable for beginners.
+## 🧾 Interface (CLI Only)
+
+No web interface. Just fast, intuitive terminal navigation.
+
+- `wallet_cli.S`: send, receive, check balance
+- `explorer_cli.S`: view blocks, tx, forgers, rewards
+- Works with ⌨ keyboard or 📱 touchscreen (Termux)
+- Navigable menu: [↑] [↓] [Enter] [Q] — 100% accessible
 
 ---
 
-## 📊 Transparent Reputation System
-- Fully automatic reputation tracking to ensure network security and fairness.
-- Visible reputation score for each wallet, chain, token, and node.
-- Built-in protection and recovery mechanism for users.
+## 🧪 Local Testing
+
+Try Neurinochain offline via `localmain` mode:
+
+- Simulates full chain with 10 wallets
+- Staking, syncing, forging, rewards
+- Great for development and education
 
 ---
 
-## 💸 Simplified Financial Access
-- Staking rewards and fees appear instantly and transparently.
-- No hidden transaction complexity: users receive funds directly and clearly.
-- Designed specifically for users unfamiliar with traditional finance.
+## 📜 License
+
+Open-source under MIT. Fork, improve, translate, localize.
 
 ---
 
-## 📜 Open & Extendable
-- Fully modular and customizable architecture.
-- Open-source under the MIT license.
-- Community contributions actively welcomed.
+## 🤝 Contribute
+
+We welcome:
+- Assembly devs
+- Terminal UI designers
+- Optimizers for low-end hardware
+- Contributors from low-bandwidth regions
+
+Start in `/cli/`, test with `localmain`, and push improvements.
 
 ---
 
-## 🔐 Privacy by Default
-- Transaction-level privacy built into the network.
-- Invisible reward minting and simplified financial interactions.
-
----
-
-## 🌱 Sustainability & Accessibility
-- Designed for low resource consumption, suitable for solar-powered devices or areas with limited electricity.
-- Low bandwidth use, compatible with slow or expensive internet.
-
----
-
-## 🧪 Local Testing: localmain
-- Easily test Neurinochain locally with a simulated blockchain (10 wallets).
-- Perfect for educational purposes, learning, or experimentation.
-
----
-
-## 🙌 Join & Contribute
-- Visit the documentation in `/docs/specs.md`.
-- Fork the repository, modify modules, and propose improvements.
-- Collaborate to build financial infrastructure accessible to everyone, everywhere.
-
-Neurinochain’s goal is simple yet powerful: deliver decentralized financial tools to anyone, regardless of location, economic status, or technical capability.
+Together, let’s make blockchain **actually usable** — not just for the privileged few.
