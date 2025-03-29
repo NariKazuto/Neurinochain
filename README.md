@@ -28,6 +28,8 @@ Neurinochain exists to serve users in:
 - **Low Resource Usage**: Under 5 MB RAM for 3000 tx/block
 - **Reputation System**: Built-in wallet/node scoring
 - **Offline Support**: Bluetooth sync, air-gapped transfers
+- **Decentralized Identity**: Support for people without documents
+- **Image Verification**: Photos/logos stored off-chain, verified via SHA-256
 
 ---
 
@@ -82,6 +84,18 @@ Try Neurinochain offline via `localmain` mode:
 
 ---
 
+## 🔹 Decentralized Identity Support
+
+Neurinochain supports modular identity registration for individuals, companies, and institutions:
+
+- Create an identity with a name, type, and image (photo or logo)
+- Image stored locally or on IPFS
+- Blockchain stores SHA-256 hash to prevent tampering
+- Once registered, the identity is immutable
+- Optional verification by trusted wallets or chains
+
+---
+
 ## 📜 License
 
 Open-source under MIT. Fork, improve, translate, localize.
@@ -100,4 +114,3 @@ We welcome:
 > Start in `/cli/`, test with `localmain`, and push improvements.
 
 Together, let’s make blockchain actually usable — not just for the privileged few.
-
