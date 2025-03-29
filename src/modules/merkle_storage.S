@@ -69,6 +69,10 @@ _buffer_get_tx_by_height:
 
     push {r4-r6, lr}
 
+    ; Protect against out-of-bounds tx_index
+    cmp r1, #3000
+    bge .not_found
+
     ; Compute index = block_height % 6
     mov r2, #6
     udiv r3, r0, r2
@@ -93,8 +97,50 @@ _buffer_get_tx_by_height:
     mov r0, #0
     pop {r4-r6, pc}
 
+.global _buffer_get_block_tx_array
+_buffer_get_block_tx_array:
+    ; Input: r0 = block_height
+    ; Output: r0 = pointer to tx array or 0 if not found
+
+    push {r4-r6, lr}
+
+    ; Compute index = block_height % 6
+    mov r2, #6
+    udiv r3, r0, r2
+    mls r4, r3, r2, r0   ; r4 = index
+
+    ; Verify stored height
+    ldr r5, =tx_ring_heights
+    add r5, r5, r4, LSL #2
+    ldr r6, [r5]
+    cmp r6, r0
+    bne .not_found_block
+
+    ; Return pointer to tx array
+    ldr r5, =tx_ring_buffer
+    mov r6, #3000
+    mul r4, r4, r6
+    add r0, r5, r4, LSL #3
+    pop {r4-r6, pc}
+
+.not_found_block:
+    mov r0, #0
+    pop {r4-r6, pc}
+
 .global _buffer_purge_oldest
 _buffer_purge_oldest:
     ; This function is optional in ring buffer (auto-overwrite)
     ; No implementation needed unless cache fallback is used
-    ret
+    bx lr
+
+.global _buffer_dump_to_cache
+_buffer_dump_to_cache:
+    ; Placeholder for optional disk fallback (/tmp or other)
+    ; Save tx_ring_buffer + tx_ring_heights to file
+    bx lr
+
+.global _buffer_load_from_cache
+_buffer_load_from_cache:
+    ; Placeholder for optional disk recovery
+    ; Load tx_ring_buffer + tx_ring_heights from file
+    bx lr
