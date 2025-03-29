@@ -1,5 +1,9 @@
-; block_format.S — Mainchain Block Structure Definition
 ; -----------------------------------------------------
+; File: /src/core/block_format.S
+; Description: Mainchain Block Structure Definition
+; Author: Union of the human intellect
+; -----------------------------------------------------
+
 ; Defines how blocks are structured in Neurinochain mainchain.
 ; Includes metadata, reward structure, and Merkle exclusions.
 ;
@@ -50,3 +54,4 @@ _block_format:
 
     ; Return (for now, placeholder)
     ret
+
